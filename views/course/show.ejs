@@ -1,0 +1,34 @@
+<%- include('../partial/header', { title: course.name }) %>
+<div class="row g-4">
+    <div class="col-lg-9">
+        <h2 class="course-title"><%= course.name %></h2>
+
+        <% if (course.videoId) { %>
+            <div class="ratio ratio-16x9 course-video">
+                <iframe
+                    src="https://www.youtube.com/embed/<%= course.videoId %>"
+                    title="<%= course.name %>"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        <% } else { %>
+            <p class="empty-state">Khóa học này chưa có video.</p>
+        <% } %>
+
+        <p class="mt-3"><%= course.description %></p>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="course-aside">
+            <button class="btn btn-primary w-100">Học ngay</button>
+
+            <% if (course.level) { %>
+                <ul class="mt-3">
+                    <li>Trình độ: <%= course.level %></li>
+                </ul>
+            <% } %>
+        </div>
+    </div>
+</div>
+<%- include('../partial/footer') %>

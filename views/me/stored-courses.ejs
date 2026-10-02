@@ -1,0 +1,90 @@
+<%- include('../partial/header', { title: 'Khóa học của tôi' }) %>
+
+<div class="mt-4">
+    <h3>Khóa học của tôi</h3>
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tên khóa học</th>
+                <th scope="col">Trình độ</th>
+                <th scope="col" colspan="2">Thời gian tạo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (courses.length === 0) { %>
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Bạn chưa đăng khóa học nào. <a href="/course/create">Đăng khóa học</a>
+                    </td>
+                </tr>
+            <% } %>
+
+            <% courses.forEach((course, index) => { %>
+                <tr>
+                    <th scope="row"><%= index + 1 %></th>
+                    <td><%= course.name %></td>
+                    <td><%= course.level %></td>
+                    <td><%= new Date(course.createdAt).toLocaleString('vi-VN') %></td>
+                    <td>
+                        <a href="/course/<%= course._id %>/edit" class="btn btn-link">Sửa</a>
+                        <button type="button" class="btn btn-link text-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete-course-modal"
+                                data-id="<%= course._id %>"
+                                data-name="<%= course.name %>">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Hộp thoại xác nhận xóa -->
+<div class="modal fade" id="delete-course-modal" tabindex="-1" aria-labelledby="delete-course-title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete-course-title">Xóa khóa học?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Bạn chắc chắn muốn xóa khóa học <strong id="delete-course-name"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-delete-course" class="btn btn-danger">Xóa bỏ</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form ẩn: chỉ dùng để gửi request DELETE -->
+<form name="delete-course-form" method="POST"></form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let courseId;
+        const deleteForm = document.forms['delete-course-form'];
+        const modal = document.getElementById('delete-course-modal');
+        const btnDelete = document.getElementById('btn-delete-course');
+
+        // Khi modal mở: lấy id và tên của khóa học vừa bấm
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            courseId = button.getAttribute('data-id');
+            document.getElementById('delete-course-name').textContent = button.getAttribute('data-name');
+        });
+
+        // Khi bấm "Xóa bỏ": gắn action cho form rồi submit
+        btnDelete.addEventListener('click', function () {
+            deleteForm.action = '/course/' + courseId + '?_method=DELETE';
+            deleteForm.submit();
+        });
+    });
+</script>
+
+<%- include('../partial/footer') %>
