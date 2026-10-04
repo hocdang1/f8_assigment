@@ -1,8 +1,8 @@
-<%- include('../partial/header', { title: 'Khóa học của tôi' }) %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<%- include('../partial/header', { title: 'Thùng rác' }) %>
+
 <div class="mt-4">
-    <h3>Khóa học của tôi</h3>
-    <a href="/me/trash/courses">Thùng rác (<%= deletedCount %>)</a>
+    <h3>Khóa học đã xóa</h3>
+    <a href="/me/stored/courses">← Khóa học của tôi</a>
 
     <form name="container-form" method="POST" action="/course/handle-form-actions">
         <div class="mt-4 d-flex align-items-center">
@@ -13,7 +13,8 @@
 
             <select class="form-select form-select-sm checkbox-select-all-options" name="action" required>
                 <option value="">-- Hành động --</option>
-                <option value="delete">Xóa</option>
+                <option value="restore">Khôi phục</option>
+                <option value="forceDelete">Xóa vĩnh viễn</option>
             </select>
 
             <button type="submit" class="btn btn-primary btn-sm check-all-submit-btn" disabled>Thực hiện</button>
@@ -26,15 +27,13 @@
                 <th scope="col">ID <%- sortable('id', _sort) %></th>
                 <th scope="col">Tên khóa học <%- sortable('name', _sort) %></th>
                 <th scope="col">Trình độ <%- sortable('level', _sort) %></th>
-                <th scope="col" colspan="2">Thời gian tạo <%- sortable('createdAt', _sort) %></th>
+                <th scope="col" colspan="2">Thời gian xóa <%- sortable('deletedAt', _sort) %></th>
             </tr>
         </thead>
         <tbody>
             <% if (courses.length === 0) { %>
                 <tr>
-                    <td colspan="6" class="text-center">
-                        Bạn chưa đăng khóa học nào. <a href="/course/create">Đăng khóa học</a>
-                    </td>
+                    <td colspan="6" class="text-center">Thùng rác trống.</td>
                 </tr>
             <% } %>
 
@@ -46,17 +45,17 @@
                         </div>
                     </td>
                     <th scope="row"><%= course.id %></th>
-                    <td><a href="/course/<%= course.slug %>"><%= course.name %></a></td>
+                    <td><%= course.name %></td>
                     <td><%= course.level %></td>
-                    <td><%= new Date(course.createdAt).toLocaleString('vi-VN') %></td>
+                    <td><%= new Date(course.deletedAt).toLocaleString('vi-VN') %></td>
                     <td>
-                        <a href="/course/<%= course.id %>/edit" class="btn btn-link">Sửa</a>
+                        <button type="button" class="btn btn-link btn-restore" data-id="<%= course.id %>">Khôi phục</button>
                         <button type="button" class="btn btn-link text-danger"
                                 data-bs-toggle="modal"
-                                data-bs-target="#delete-course-modal"
+                                data-bs-target="#force-delete-modal"
                                 data-id="<%= course.id %>"
                                 data-name="<%= course.name %>">
-                            Xóa
+                            Xóa vĩnh viễn
                         </button>
                     </td>
                 </tr>
@@ -66,46 +65,52 @@
     </form>
 </div>
 
-<!-- Hộp thoại xác nhận xóa -->
-<div class="modal fade" id="delete-course-modal" tabindex="-1" aria-labelledby="delete-course-title" aria-hidden="true">
+<!-- xác nhận xoá vv -->
+<div class="modal fade" id="force-delete-modal" tabindex="-1" aria-labelledby="force-delete-title" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="delete-course-title">Xóa khóa học?</h5>
+                <h5 class="modal-title" id="force-delete-title">Xóa vĩnh viễn?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <div class="modal-body">
-                Bạn chắc chắn muốn xóa khóa học <strong id="delete-course-name"></strong>?
+                Khóa học <strong id="force-delete-name"></strong> sẽ bị xóa vĩnh viễn và không thể khôi phục.
             </div>
             <div class="modal-footer">
-                <button type="button" id="btn-delete-course" class="btn btn-danger">Xóa bỏ</button>
+                <button type="button" id="btn-force-delete" class="btn btn-danger">Xóa vĩnh viễn</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Form ẩn: chỉ dùng để gửi request DELETE -->
-<form name="delete-course-form" method="POST"></form>
+<form name="force-delete-form" method="POST"></form>
+<form name="restore-form" method="POST"></form>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         let courseId;
-        const deleteForm = document.forms['delete-course-form'];
-        const modal = document.getElementById('delete-course-modal');
-        const btnDelete = document.getElementById('btn-delete-course');
+        const deleteForm = document.forms['force-delete-form'];
+        const modal = document.getElementById('force-delete-modal');
 
-        // Khi modal mở: lấy id và tên của khóa học vừa bấm
         modal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             courseId = button.getAttribute('data-id');
-            document.getElementById('delete-course-name').textContent = button.getAttribute('data-name');
+            document.getElementById('force-delete-name').textContent = button.getAttribute('data-name');
         });
 
-        // Khi bấm "Xóa bỏ": gắn action cho form rồi submit
-        btnDelete.addEventListener('click', function () {
-            deleteForm.action = '/course/' + courseId + '?_method=DELETE';
+        document.getElementById('btn-force-delete').addEventListener('click', function () {
+            deleteForm.action = '/course/' + courseId + '/force?_method=DELETE';
             deleteForm.submit();
+        });
+
+        // Khôi phục từng ô
+        const restoreForm = document.forms['restore-form'];
+        document.querySelectorAll('.btn-restore').forEach((button) => {
+            button.addEventListener('click', function () {
+                restoreForm.action = '/course/' + button.getAttribute('data-id') + '/restore?_method=PATCH';
+                restoreForm.submit();
+            });
         });
     });
 </script>

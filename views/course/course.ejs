@@ -14,7 +14,7 @@
     <% courses.forEach(course => { %>
         <div class="col-sm-6 col-lg-4">
             <div class="card course-card h-100">
-                <a href="/course/<%= course.id %>" class="course-thumb">
+                <a href="/course/<%= course.slug %>" class="course-thumb">
                     <% if (course.image) { %>
                         <img
                             src="<%= course.image %>"
@@ -28,7 +28,7 @@
 
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a href="/course/<%= course.id %>"><%= course.name %></a>
+                        <a href="/course/<%= course.slug %>"><%= course.name %></a>
                     </h5>
 
                     <p class="card-text">

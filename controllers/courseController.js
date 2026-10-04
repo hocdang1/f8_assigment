@@ -1,6 +1,7 @@
 'use strict';
 
 const createError = require('http-errors');
+const { Op } = require('sequelize');
 const { Course } = require('../models');
 
 class CourseController {
@@ -18,7 +19,7 @@ class CourseController {
 
     async show(req, res, next) {
         try {
-            const course = await Course.findByPk(req.params.id, { raw: true });
+            const course = await Course.findOne({ where: { slug: req.params.slug }, raw: true });
 
             if (!course) {
                 return next(createError(404, 'Không tìm thấy khóa học'));
@@ -88,8 +89,90 @@ class CourseController {
             next(error);
         }
     }
-    
-    
+
+    async destroy(req, res, next) {
+        try {
+            const course = await Course.findByPk(req.params.id);
+
+            if (!course) {
+                return next(createError(404, 'Không tìm thấy khóa học'));
+            }
+
+            await course.destroy();
+
+            res.redirect('/me/stored/courses');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async restore(req, res, next) {
+        try {
+            const course = await Course.findByPk(req.params.id, { paranoid: false });
+
+            if (!course) {
+                return next(createError(404, 'Không tìm thấy khóa học'));
+            }
+
+            await course.restore();
+
+            res.redirect('/me/trash/courses');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    async forceDestroy(req, res, next) {
+        try {
+            const course = await Course.findByPk(req.params.id, { paranoid: false });
+
+            if (!course) {
+                return next(createError(404, 'Không tìm thấy khóa học'));
+            }
+
+            await course.destroy({ force: true });
+
+            res.redirect('/me/trash/courses');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+    async handleFormActions(req, res, next) {
+        try {
+
+            const courseIds = [].concat(req.body.courseIds || []);
+
+            if (courseIds.length === 0) {
+                return next(createError(400, 'Chưa chọn khóa học nào'));
+            }
+
+            switch (req.body.action) {
+                case 'delete':
+                    await Course.destroy({ where: { id: { [Op.in]: courseIds } } });
+                    return res.redirect('/me/stored/courses');
+
+                case 'restore':
+                    await Course.restore({ where: { id: { [Op.in]: courseIds } } });
+                    return res.redirect('/me/trash/courses');
+
+                case 'forceDelete':
+               
+                    await Course.destroy({
+                        where: { id: { [Op.in]: courseIds }, deletedAt: { [Op.ne]: null } },
+                        force: true,
+                    });
+                    return res.redirect('/me/trash/courses');
+
+                default:
+                    return next(createError(400, 'Hành động không hợp lệ'));
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new CourseController();

@@ -1,0 +1,57 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding: 24px 0;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.hero {
+    text-align: center;
+    padding: 48px 0;
+}
+
+.course-thumb,
+.course-thumb-placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: #eee;
+}
+
+.form-card {
+    max-width: 600px;
+}
+
+.empty-state,
+.error-page {
+    text-align: center;
+    padding: 48px 0;
+}
+
+.error-status {
+    font-size: 64px;
+    font-weight: bold;
+}
+
+.site-footer {
+    padding: 16px 0;
+    text-align: center;
+    color: #888;
+    border-top: 1px solid #eee;
+}
+
+/* Thanh hành động hàng loạt (chọn tất cả + hành động + thực hiện) */
+.checkbox-select-all-options {
+    width: 160px;
+    margin: 0 16px;
+}

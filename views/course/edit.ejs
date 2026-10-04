@@ -2,7 +2,7 @@
 <div class="form-card">
     <h3>Sửa khóa học</h3>
 
-    <form method="POST" action="/course/<%= course.id %>">
+    <form method="POST" action="/course/<%= course.id %>?_method=PUT">
         <div class="mb-3">
             <label for="name" class="form-label">Tên khóa học</label>
             <input type="text" class="form-control" value="<%= course.name %>" id="name" name="name" required>
