@@ -11,6 +11,7 @@ const methodOverride = require('method-override');
 const indexRouter = require('./routes/index');
 const courseRouter = require('./routes/course');
 const meRouter = require('./routes/me');
+const apiV1Router = require('./routes/api-v1');
 const app = express();
 
 const sortMiddleware = require('./middlewares/sortMiddleware');
@@ -19,7 +20,7 @@ const sortable = require('./helpers/sortable');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// helper dùng được trong mọi file .ejs (giống helper của handlebars)
+// helper dùng được trong mọi file .ejs
 app.locals.sortable = sortable;
 
 app.use(logger('dev'));
@@ -29,7 +30,7 @@ app.use(methodOverride('_method')); // cho phép form gửi PUT/PATCH/DELETE qua
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// custom middleware: phải đặt TRƯỚC các route thì mới chạy trước controller
+// custom middleware: phải đặt trước các route
 app.use(sortMiddleware);
 
 app.use('/', indexRouter);
