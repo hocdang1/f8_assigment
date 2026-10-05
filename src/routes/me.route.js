@@ -1,8 +1,8 @@
-const express = require('express');
+const { Router } = require('express');
 
-const router = express.Router();
+const meController = require('../controllers/me.controller');
 
-const meController = require('../../controllers/api-v1/meController');
+const router = Router();
 
 router.get('/stored/courses', meController.storedCourses);
 router.get('/trash/courses', meController.trashCourses);
