@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "db:migrate": "sequelize-cli db:migrate",
-    "db:seed": "sequelize-cli db:seed:all",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node --import tsx node_modules/sequelize-cli/lib/sequelize db:migrate",
+    "db:migrate:undo": "node --import tsx node_modules/sequelize-cli/lib/sequelize db:migrate:undo",
+    "db:seed": "node --import tsx node_modules/sequelize-cli/lib/sequelize db:seed:all",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -20,7 +23,13 @@
     "slugify": "^1.6.9"
   },
   "devDependencies": {
+    "@types/express": "^4.17.25",
+    "@types/http-errors": "^2.0.5",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^26.6.4",
     "prettier": "^3.9.9",
-    "sequelize-cli": "^6.6.5"
+    "sequelize-cli": "^6.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }

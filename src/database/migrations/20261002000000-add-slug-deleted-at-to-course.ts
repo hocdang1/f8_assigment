@@ -1,19 +1,21 @@
-'use strict';
+import { DataTypes, QueryInterface, QueryTypes } from 'sequelize';
+import slugify from 'slugify';
 
-const slugify = require('slugify');
-
-module.exports = {
-    async up(queryInterface, Sequelize) {
+export default {
+    async up(queryInterface: QueryInterface) {
         await queryInterface.addColumn('courses', 'slug', {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         });
         await queryInterface.addColumn('courses', 'deleted_at', {
-            type: Sequelize.DATE,
+            type: DataTypes.DATE,
         });
 
         // Tạo slug cho các khóa học đã có
-        const [courses] = await queryInterface.sequelize.query('SELECT id, name FROM courses ORDER BY id');
-        const used = new Set();
+        const courses = await queryInterface.sequelize.query<{ id: number; name: string }>(
+            'SELECT id, name FROM courses ORDER BY id',
+            { type: QueryTypes.SELECT },
+        );
+        const used = new Set<string>();
         for (const course of courses) {
             const base = slugify(course.name, { lower: true, strict: true, locale: 'vi' }) || 'khoa-hoc';
             let slug = base;
@@ -24,7 +26,7 @@ module.exports = {
         }
 
         await queryInterface.changeColumn('courses', 'slug', {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
         });
         await queryInterface.addIndex('courses', ['slug'], {
@@ -32,7 +34,7 @@ module.exports = {
             name: 'courses_slug_unique',
         });
     },
-    async down(queryInterface) {
+    async down(queryInterface: QueryInterface) {
         await queryInterface.removeIndex('courses', 'courses_slug_unique');
         await queryInterface.removeColumn('courses', 'deleted_at');
         await queryInterface.removeColumn('courses', 'slug');

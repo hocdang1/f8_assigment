@@ -1,7 +1,7 @@
-'use strict';
+import { QueryInterface } from 'sequelize';
 
-module.exports = {
-    async up(queryInterface) {
+export default {
+    async up(queryInterface: QueryInterface) {
         const now = new Date();
 
         await queryInterface.bulkInsert('courses', [
@@ -10,7 +10,7 @@ module.exports = {
             { name: 'Le Van C', slug: 'le-van-c', description: 'anh day chiu kho', created_at: now, updated_at: now },
         ]);
     },
-    async down(queryInterface) {
-        await queryInterface.bulkDelete('courses', null, {});
+    async down(queryInterface: QueryInterface) {
+        await queryInterface.bulkDelete('courses', {}, {});
     },
 };

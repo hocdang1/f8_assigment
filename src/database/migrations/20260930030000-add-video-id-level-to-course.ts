@@ -1,15 +1,15 @@
-'use strict';
+import { DataTypes, QueryInterface } from 'sequelize';
 
-module.exports = {
-    async up(queryInterface, Sequelize) {
+export default {
+    async up(queryInterface: QueryInterface) {
         await queryInterface.addColumn('courses', 'video_id', {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         });
         await queryInterface.addColumn('courses', 'level', {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         });
     },
-    async down(queryInterface) {
+    async down(queryInterface: QueryInterface) {
         await queryInterface.removeColumn('courses', 'level');
         await queryInterface.removeColumn('courses', 'video_id');
     },

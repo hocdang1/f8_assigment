@@ -1,13 +1,24 @@
-'use strict';
+import { NextFunction, Request, Response } from 'express';
+import createError from 'http-errors';
 
-const createError = require('http-errors');
-const { Course } = require('../models');
+import { Course } from '../models';
 
-const youtubeImage = (videoId) => `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/sddefault.jpg`;
+// Dữ liệu client gửi lên khi tạo/cập nhật khóa học
+interface CourseBody {
+    name: string;
+    description?: string;
+    videoId: string;
+    level?: string;
+}
+
+type SlugParams = { slug: string };
+type IdParams = { id: string };
+
+const youtubeImage = (videoId: string) => `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/sddefault.jpg`;
 
 class CourseController {
     // GET /api/v1/courses
-    async index(req, res, next) {
+    async index(_req: Request, res: Response, next: NextFunction) {
         try {
             const courses = await Course.findAll({ raw: true });
 
@@ -18,7 +29,7 @@ class CourseController {
     }
 
     // GET /api/v1/courses/:slug
-    async show(req, res, next) {
+    async show(req: Request<SlugParams>, res: Response, next: NextFunction) {
         try {
             const course = await Course.findOne({ where: { slug: req.params.slug }, raw: true });
 
@@ -33,7 +44,7 @@ class CourseController {
     }
 
     // POST /api/v1/courses
-    async store(req, res, next) {
+    async store(req: Request<{}, unknown, CourseBody>, res: Response, next: NextFunction) {
         try {
             const { name, description, videoId, level } = req.body;
 
@@ -52,7 +63,7 @@ class CourseController {
     }
 
     // PUT /api/v1/courses/:id
-    async update(req, res, next) {
+    async update(req: Request<IdParams, unknown, Partial<CourseBody>>, res: Response, next: NextFunction) {
         try {
             const course = await Course.findByPk(req.params.id);
 
@@ -80,7 +91,7 @@ class CourseController {
     }
 
     // DELETE /api/v1/courses/:id (xóa mềm)
-    async destroy(req, res, next) {
+    async destroy(req: Request<IdParams>, res: Response, next: NextFunction) {
         try {
             const course = await Course.findByPk(req.params.id);
 
@@ -97,7 +108,7 @@ class CourseController {
     }
 
     // PATCH /api/v1/courses/:id/restore
-    async restore(req, res, next) {
+    async restore(req: Request<IdParams>, res: Response, next: NextFunction) {
         try {
             const course = await Course.findByPk(req.params.id, { paranoid: false });
 
@@ -114,7 +125,7 @@ class CourseController {
     }
 
     // DELETE /api/v1/courses/:id/force (xóa vĩnh viễn)
-    async forceDestroy(req, res, next) {
+    async forceDestroy(req: Request<IdParams>, res: Response, next: NextFunction) {
         try {
             const course = await Course.findByPk(req.params.id, { paranoid: false });
 
@@ -132,4 +143,4 @@ class CourseController {
     }
 }
 
-module.exports = new CourseController();
+export default new CourseController();

@@ -1,11 +1,11 @@
-'use strict';
+import { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 
-const { Op } = require('sequelize');
-const { Course } = require('../models');
+import { Course } from '../models';
 
 class MeController {
     // GET /api/v1/me/stored/courses
-    async storedCourses(req, res, next) {
+    async storedCourses(_req: Request, res: Response, next: NextFunction) {
         try {
             const courses = await Course.findAll({
                 order: [['createdAt', 'DESC']],
@@ -24,7 +24,7 @@ class MeController {
     }
 
     // GET /api/v1/me/trash/courses
-    async trashCourses(req, res, next) {
+    async trashCourses(_req: Request, res: Response, next: NextFunction) {
         try {
             const courses = await Course.findAll({
                 where: { deletedAt: { [Op.ne]: null } },
@@ -40,4 +40,4 @@ class MeController {
     }
 }
 
-module.exports = new MeController();
+export default new MeController();

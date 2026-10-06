@@ -1,8 +1,8 @@
-const { Router } = require('express');
+import { Router } from 'express';
+
+import courseController from '../controllers/course.controller';
 
 const router = Router();
-
-const courseController = require('../controllers/course.controller');
 
 router.post('/', courseController.store);
 
@@ -16,4 +16,4 @@ router.patch('/:id(\\d+)/restore', courseController.restore);
 router.delete('/:id(\\d+)/force', courseController.forceDestroy);
 router.delete('/:id(\\d+)', courseController.destroy);
 
-module.exports = router;
+export default router;

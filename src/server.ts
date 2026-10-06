@@ -1,10 +1,9 @@
-const http = require('http');
+import http from 'http';
+import app from './app';
+import config from './config';
 
-const app = require('./app');
-const config = require('./config');
-
-function initProcessHandlers(server) {
-    const shutdown = (signal) => {
+function initProcessHandlers(server: http.Server): void {
+    const shutdown = (signal: NodeJS.Signals) => {
         console.log(`${signal} received: closing HTTP server`);
         server.close(() => {
             console.log('HTTP server closed');
