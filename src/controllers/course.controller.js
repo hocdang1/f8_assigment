@@ -1,8 +1,7 @@
 'use strict';
 
 const createError = require('http-errors');
-const { Op } = require('sequelize');
-const { Course } = require('../../models');
+const { Course } = require('../models');
 
 const youtubeImage = (videoId) => `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/sddefault.jpg`;
 
@@ -63,14 +62,16 @@ class CourseController {
 
             const { name, description, videoId, level } = req.body;
 
-            await course.update({
+            // set + save (không dùng update): update chỉ lưu các field truyền vào
+            // nên slug mới do hook beforeUpdate tạo ra sẽ bị bỏ qua
+            course.set({
                 name,
                 description,
                 videoId,
                 level,
-                
                 ...(videoId && { image: youtubeImage(videoId) }),
             });
+            await course.save();
 
             res.status(200).json({ success: true, message: 'Cập nhật khóa học thành công', data: course });
         } catch (error) {
@@ -78,7 +79,7 @@ class CourseController {
         }
     }
 
-    // 
+    // DELETE /api/v1/courses/:id (xóa mềm)
     async destroy(req, res, next) {
         try {
             const course = await Course.findByPk(req.params.id);
@@ -117,7 +118,8 @@ class CourseController {
         try {
             const course = await Course.findByPk(req.params.id, { paranoid: false });
 
-            if (!course) {
+            // chỉ xóa vĩnh viễn khóa học đã nằm trong thùng rác
+            if (!course || !course.deletedAt) {
                 return next(createError(404, 'Không tìm thấy khóa học'));
             }
 
@@ -128,8 +130,6 @@ class CourseController {
             next(error);
         }
     }
-
-    
 }
 
 module.exports = new CourseController();
