@@ -12,7 +12,4 @@ export const sequelize = new Sequelize({
     },
 });
 
-
 export const Course = initCourse(sequelize);
-
-

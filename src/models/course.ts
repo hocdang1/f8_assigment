@@ -16,14 +16,17 @@ export interface SortOptions {
     type: string;
 }
 
-export class Course extends Model<InferAttributes<Course>, InferCreationAttributes<Course>> {
+export class Course extends Model<
+    InferAttributes<Course>,
+    InferCreationAttributes<Course>
+> {
     declare id: CreationOptional<number>;
     declare name: string;
     declare description: string | null;
     declare image: string | null;
     declare videoId: string;
     declare level: string | null;
-   
+
     declare slug: CreationOptional<string>;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
@@ -31,7 +34,10 @@ export class Course extends Model<InferAttributes<Course>, InferCreationAttribut
 
     // Trả về mảng order cho findAll dựa vào res.locals._sort
     // Dùng: Course.findAll({ order: Course.sortable(res.locals._sort) })
-    static sortable(sort: SortOptions, defaultOrder: Order = [['createdAt', 'DESC']]): Order {
+    static sortable(
+        sort: SortOptions,
+        defaultOrder: Order = [['createdAt', 'DESC']],
+    ): Order {
         // chỉ cho sắp xếp theo cột có thật trong model (không tin người dùng)
         const columns = Object.keys(this.getAttributes());
 
@@ -47,7 +53,12 @@ export class Course extends Model<InferAttributes<Course>, InferCreationAttribut
 // Tạo slug từ name, thêm -1, -2... nếu trùng
 async function setSlug(course: Course): Promise<void> {
     // name rỗng/sai kiểu vẫn gán slug tạm để lỗi trả về là lỗi validate của name
-    const base = slugify(String(course.name ?? ''), { lower: true, strict: true, locale: 'vi' }) || 'khoa-hoc';
+    const base =
+        slugify(String(course.name ?? ''), {
+            lower: true,
+            strict: true,
+            locale: 'vi',
+        }) || 'khoa-hoc';
     let slug = base;
     let i = 1;
     while (
@@ -75,12 +86,17 @@ export function initCourse(sequelize: Sequelize): typeof Course {
                 validate: {
                     notNull: { msg: 'Tên khóa học không được để trống' },
                     notEmpty: { msg: 'Tên khóa học không được để trống' },
-                    len: { args: [0, 255], msg: 'Tên khóa học tối đa 255 ký tự' },
+                    len: {
+                        args: [0, 255],
+                        msg: 'Tên khóa học tối đa 255 ký tự',
+                    },
                 },
             },
             description: {
                 type: DataTypes.STRING,
-                validate: { len: { args: [0, 255], msg: 'Mô tả tối đa 255 ký tự' } },
+                validate: {
+                    len: { args: [0, 255], msg: 'Mô tả tối đa 255 ký tự' },
+                },
             },
             image: { type: DataTypes.STRING },
             videoId: {
@@ -107,7 +123,8 @@ export function initCourse(sequelize: Sequelize): typeof Course {
             hooks: {
                 // Tạo mới: gán slug trước khi validate (slug là NOT NULL)
                 async beforeValidate(course) {
-                    if (course.isNewRecord && !course.slug) await setSlug(course);
+                    if (course.isNewRecord && !course.slug)
+                        await setSlug(course);
                 },
                 // Cập nhật: phải gán ở beforeUpdate, vì field đổi trong beforeValidate
                 // không được Sequelize đưa vào câu UPDATE

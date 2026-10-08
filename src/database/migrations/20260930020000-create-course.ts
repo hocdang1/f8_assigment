@@ -15,12 +15,14 @@ export default {
             created_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: queryInterface.sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue:
+                    queryInterface.sequelize.literal('CURRENT_TIMESTAMP'),
             },
             updated_at: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: queryInterface.sequelize.literal('CURRENT_TIMESTAMP'),
+                defaultValue:
+                    queryInterface.sequelize.literal('CURRENT_TIMESTAMP'),
             },
         });
     },

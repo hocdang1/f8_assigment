@@ -17,7 +17,11 @@ class MeController {
                 paranoid: false,
             });
 
-            res.status(200).json({ success: true, data: courses, deletedCount });
+            res.status(200).json({
+                success: true,
+                data: courses,
+                deletedCount,
+            });
         } catch (error) {
             next(error);
         }

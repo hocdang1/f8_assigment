@@ -11,18 +11,29 @@ export default {
         });
 
         // Tạo slug cho các khóa học đã có
-        const courses = await queryInterface.sequelize.query<{ id: number; name: string }>(
-            'SELECT id, name FROM courses ORDER BY id',
-            { type: QueryTypes.SELECT },
-        );
+        const courses = await queryInterface.sequelize.query<{
+            id: number;
+            name: string;
+        }>('SELECT id, name FROM courses ORDER BY id', {
+            type: QueryTypes.SELECT,
+        });
         const used = new Set<string>();
         for (const course of courses) {
-            const base = slugify(course.name, { lower: true, strict: true, locale: 'vi' }) || 'khoa-hoc';
+            const base =
+                slugify(course.name, {
+                    lower: true,
+                    strict: true,
+                    locale: 'vi',
+                }) || 'khoa-hoc';
             let slug = base;
             let i = 1;
             while (used.has(slug)) slug = `${base}-${i++}`;
             used.add(slug);
-            await queryInterface.bulkUpdate('courses', { slug }, { id: course.id });
+            await queryInterface.bulkUpdate(
+                'courses',
+                { slug },
+                { id: course.id },
+            );
         }
 
         await queryInterface.changeColumn('courses', 'slug', {
