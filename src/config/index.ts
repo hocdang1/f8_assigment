@@ -1,18 +1,4 @@
 import 'dotenv/config';
-import type { Dialect } from 'sequelize';
-
-interface Config {
-    port: number;
-    environment: string;
-    db: {
-        dialect: Dialect;
-        host: string;
-        port: number;
-        username: string;
-        password: string;
-        database: string;
-    };
-}
 
 function requireEnv(name: string): string {
     const value = process.env[name];
@@ -22,7 +8,7 @@ function requireEnv(name: string): string {
     return value;
 }
 
-const config: Config = {
+const config = {
     port: Number(process.env.PORT) || 3000,
     environment: process.env.NODE_ENV || 'development',
     db: {
@@ -33,6 +19,6 @@ const config: Config = {
         password: process.env.DB_PASSWORD ?? '',
         database: requireEnv('DB_NAME'),
     },
-};
+} as const;
 
 export default config;
