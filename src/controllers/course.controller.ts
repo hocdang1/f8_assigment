@@ -49,7 +49,7 @@ class CourseController {
 
     // POST /api/v1/courses
     async store(
-        req: Request<{}, unknown, CourseBody>,
+        req: Request<Record<string, never>, unknown, CourseBody>,
         res: Response,
         next: NextFunction,
     ) {
