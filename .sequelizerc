@@ -1,7 +1,13 @@
 const path = require('path');
+
+// production chạy bản đã build trong dist (không cần tsx), còn lại chạy thẳng file .ts trong src
+const isProduction = process.env.NODE_ENV === 'production';
+const root = isProduction ? 'dist' : 'src';
+const ext = isProduction ? 'js' : 'ts';
+
 module.exports = {
-  config:            path.resolve('src', 'config', 'database.js'),
-  'models-path':     path.resolve('src', 'models'),
-  'seeders-path':    path.resolve('src', 'database', 'seeders'),
-  'migrations-path': path.resolve('src', 'database', 'migrations'),
+  config:            path.resolve(root, 'config', `database.${ext}`),
+  'models-path':     path.resolve(root, 'models'),
+  'seeders-path':    path.resolve(root, 'database', 'seeders'),
+  'migrations-path': path.resolve(root, 'database', 'migrations'),
 };

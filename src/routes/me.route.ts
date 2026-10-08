@@ -1,10 +1,10 @@
-const { Router } = require('express');
+import { Router } from 'express';
 
-const meController = require('../controllers/me.controller');
+import meController from '../controllers/me.controller';
 
 const router = Router();
 
 router.get('/stored/courses', meController.storedCourses);
 router.get('/trash/courses', meController.trashCourses);
 
-module.exports = router;
+export default router;
